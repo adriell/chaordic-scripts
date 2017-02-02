@@ -1,15 +1,18 @@
 #!/bin/bash
 CONTROL_REPO="https://github.com/adriell/puppet-control.git"
 # Install PGP key and add HTTPS support for APT
-sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 561F9B9CAC40B2F7
-sudo apt-get install -y apt-transport-https ca-certificates
+apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 561F9B9CAC40B2F7
+wget https://apt.puppetlabs.com/puppetlabs-release-pc1-xenial.deb
+dpkg -i puppetlabs-release-pc1-xenial.deb
+
+apt-get install -y apt-transport-https ca-certificates
 
 # Add APT repository
 sudo sh -c 'echo deb https://oss-binaries.phusionpassenger.com/apt/passenger xenial main > /etc/apt/sources.list.d/passenger.list'
-sudo apt-get update
 apt-get update
-source /etc/profile.d/puppet-agent.sh  
 
+apt-get install puppetserver -y
+source /etc/profile.d/puppet-agent.sh
 puppet resource package git ensure=present
 puppet resource package vim ensure=present
 
@@ -42,4 +45,4 @@ EOF
 
 /opt/puppetlabs/puppet/bin/r10k deploy environment production -v debug --puppetfile
 
-/opt/puppetlabs/bin/puppet apply /etc/puppetlabs/code/environments/production/manifests/site.pp
+puppet apply /etc/puppetlabs/code/environments/production/manifests/site.pp
